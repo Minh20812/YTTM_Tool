@@ -1,0 +1,6 @@
+srt
+edge-srt-to-speech
+yt-dlp
+internetarchive
+firebase_admin
+pydub
