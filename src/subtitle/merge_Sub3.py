@@ -150,7 +150,7 @@ def process_file(input_file):
     print(f"Sau khi gộp: {len(merged_subtitles)} subtitle")
     
     # Tạo tên file output
-    output_file = input_file.replace('.merge2.srt', '.merge3.srt')
+    output_file = str(input_file).replace('.merge2.srt', '.merge3.srt')
     
     try:
         # Ghi file output

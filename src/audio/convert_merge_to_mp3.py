@@ -1,3 +1,64 @@
+import glob
+import subprocess
+import os
+from pathlib import Path
+
+def convert_to_mp3(srt_file, output_dir):
+    # Lấy tên file gốc, loại bỏ phần .merge4.srt
+    file_name = srt_file.name
+    if file_name.endswith('.merge4.srt'):
+        # Tách tên file thành các phần
+        parts = file_name.replace('.merge4.srt', '').split('.')
+        # Lấy phần đầu tiên (video ID)
+        base_name = parts[0]
+    else:
+        # Fallback nếu không đúng format
+        base_name = srt_file.stem.replace('.merge4', '')
+    
+    mp3_file = output_dir / f"{base_name}.mp3"
+
+    print(f"[🎧] Đang tạo MP3 từ {srt_file.name} ...")
+    print(f"     ↳ Tên file đầu ra: {mp3_file.name}")
+
+    try:
+        subprocess.run(
+            [
+                "python", "-m", "edge_srt_to_speech",
+                str(srt_file), str(mp3_file),
+                "--voice", "vi-VN-NamMinhNeural"
+            ],
+            check=True
+        )
+        print(f"[✅] Đã tạo MP3: {mp3_file}")
+    except subprocess.CalledProcessError as e:
+        print(f"[❌] Lỗi khi tạo {mp3_file}")
+        print(f"     ↳ Trạng thái: {e.returncode}")
+    except Exception as e:
+        print(f"[🔥] Lỗi không xác định khi xử lý {srt_file}: {e}")
+
+def main():
+    # Xác định thư mục storage cùng cấp với thư mục cha của script
+    current_dir = Path(__file__).resolve().parent
+    parent_dir = current_dir.parent
+    storage_dir = parent_dir / "storage"
+
+    # Tìm tất cả file .merge4.srt
+    srt_files = list(storage_dir.glob("*.merge4.srt"))
+    print(f"[📂] Tìm thấy {len(srt_files)} file *.merge4.srt trong {storage_dir}")
+
+    if not srt_files:
+        print("[⚠️] Không tìm thấy file .merge4.srt nào!")
+        return
+
+    for srt_file in srt_files:
+        print(f"\n[🎬] Đang xử lý: {srt_file.name}")
+        convert_to_mp3(srt_file, storage_dir)
+
+    print("\n[🏁] Đã hoàn tất chuyển đổi tất cả file.")
+
+if __name__ == "__main__":
+    main()
+
 # import glob
 # import subprocess
 # import os
@@ -55,47 +116,48 @@
 
 
 
-import glob
-import subprocess
-import os
-from pathlib import Path
+# import glob
+# import subprocess
+# import os
+# from pathlib import Path
 
-def convert_to_mp3(srt_file, output_dir):
-    base_name = srt_file.stem.replace('.merge4', '')
-    mp3_file = output_dir / f"{base_name}.mp3"
+# def convert_to_mp3(srt_file, output_dir):
+#     base_name = srt_file.stem.replace('.merge4', '')
+#     mp3_file = output_dir / f"{base_name}.mp3"
 
-    print(f"[🎧] Đang tạo MP3 từ {srt_file} ...")
+#     print(f"[🎧] Đang tạo MP3 từ {srt_file} ...")
 
-    try:
-        subprocess.run(
-            [
-                "python", "-m", "edge_srt_to_speech",
-                str(srt_file), str(mp3_file),
-                "--voice", "vi-VN-NamMinhNeural"
-            ],
-            check=True
-        )
-        print(f"[✅] Đã tạo MP3: {mp3_file}")
-    except subprocess.CalledProcessError as e:
-        print(f"[❌] Lỗi khi tạo {mp3_file}")
-        print(f"     ↳ Trạng thái: {e.returncode}")
-    except Exception as e:
-        print(f"[🔥] Lỗi không xác định khi xử lý {srt_file}: {e}")
+#     try:
+#         subprocess.run(
+#             [
+#                 "python", "-m", "edge_srt_to_speech",
+#                 str(srt_file), str(mp3_file),
+#                 "--voice", "vi-VN-NamMinhNeural"
+#             ],
+#             check=True
+#         )
+#         print(f"[✅] Đã tạo MP3: {mp3_file}")
+#     except subprocess.CalledProcessError as e:
+#         print(f"[❌] Lỗi khi tạo {mp3_file}")
+#         print(f"     ↳ Trạng thái: {e.returncode}")
+#     except Exception as e:
+#         print(f"[🔥] Lỗi không xác định khi xử lý {srt_file}: {e}")
 
-def main():
-    # Xác định thư mục storage cùng cấp với thư mục cha của script
-    current_dir = Path(__file__).resolve().parent
-    parent_dir = current_dir.parent
-    storage_dir = parent_dir / "storage"
+# def main():
+#     # Xác định thư mục storage cùng cấp với thư mục cha của script
+#     current_dir = Path(__file__).resolve().parent
+#     parent_dir = current_dir.parent
+#     storage_dir = parent_dir / "storage"
 
-    srt_files = list(storage_dir.glob("*.merge4.srt"))
-    print(f"[📂] Tìm thấy {len(srt_files)} file *.merge4.srt trong {storage_dir}")
+#     srt_files = list(storage_dir.glob("*.merge4.srt"))
+#     print(f"[📂] Tìm thấy {len(srt_files)} file *.merge4.srt trong {storage_dir}")
 
-    for srt_file in srt_files:
-        print(f"\n[🎬] Đang xử lý: {srt_file.name}")
-        convert_to_mp3(srt_file, storage_dir)
+#     for srt_file in srt_files:
+#         print(f"\n[🎬] Đang xử lý: {srt_file.name}")
+#         convert_to_mp3(srt_file, storage_dir)
 
-    print("\n[🏁] Đã hoàn tất chuyển đổi tất cả file.")
+#     print("\n[🏁] Đã hoàn tất chuyển đổi tất cả file.")
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()
+

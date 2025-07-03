@@ -1,10 +1,14 @@
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 import subprocess
 import json
-import os
+from dotenv import load_dotenv
 import firebase_admin
 from firebase_admin import credentials, firestore
 from src.youtube.get_latest_video2 import main as get_latest_links
 
+load_dotenv()
 # Tạo đường dẫn đến thư mục storage cùng cấp với thư mục cha của script
 STORAGE_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "storage")
 
@@ -17,14 +21,37 @@ def ensure_storage_directory():
         print(f"📁 Using storage directory: {STORAGE_DIR}")
 
 def initialize_firebase():
-    """Initialize Firebase connection"""
+    """Initialize Firebase connection using environment variable"""
     try:
         # Check if Firebase is already initialized
         firebase_admin.get_app()
     except ValueError:
         # Initialize if not already done
-        cred = credentials.Certificate("./serviceAccountKey.json")
-        firebase_admin.initialize_app(cred)
+        try:
+            # Lấy service account key từ biến môi trường
+            service_account_key = os.getenv('FIREBASE_SERVICE_ACCOUNT_KEY')
+            
+            if not service_account_key:
+                raise ValueError("FIREBASE_SERVICE_ACCOUNT_KEY environment variable not found")
+            
+            # Parse JSON string thành dict
+            service_account_info = json.loads(service_account_key)
+            
+            # Tạo credentials từ dict
+            cred = credentials.Certificate(service_account_info)
+            firebase_admin.initialize_app(cred)
+            
+            print("✅ Firebase initialized successfully from environment variable")
+            
+        except json.JSONDecodeError as e:
+            print(f"❌ Error parsing FIREBASE_SERVICE_ACCOUNT_KEY: {e}")
+            raise
+        except ValueError as e:
+            print(f"❌ Firebase initialization error: {e}")
+            raise
+        except Exception as e:
+            print(f"❌ Unexpected error initializing Firebase: {e}")
+            raise
     
     return firestore.client()
 

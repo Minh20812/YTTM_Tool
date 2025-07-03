@@ -4,3 +4,4 @@ yt-dlp
 internetarchive
 firebase_admin
 pydub
+python-dotenv

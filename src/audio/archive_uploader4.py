@@ -18,12 +18,17 @@ import logging
 from datetime import datetime, timedelta
 import re
 
+current_dir = Path(__file__).resolve().parent
+parent_dir = current_dir.parent
+storage_dir = parent_dir / "storage"
+log_file_path = storage_dir / "upload_log.log"
+
 # Thiết lập logging với encoding UTF-8
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('upload_log.log', encoding='utf-8'),
+        logging.FileHandler(log_file_path, encoding='utf-8'),
         logging.StreamHandler(sys.stdout)
     ]
 )
