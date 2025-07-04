@@ -205,8 +205,6 @@ def download_sub(video_data, max_retries=2):
 
     if os.path.exists(final_output):
         print(f"⚠️ Skipping download (file exists): {final_output}")
-        # Still add to Firebase even if file exists
-        add_video_to_firebase(video_data)
         return True
 
     # Check if subtitles are available
@@ -332,11 +330,10 @@ def process_new_videos(hours=36, skip_shorts=True):
         print(f"\n[{i}/{len(truly_new_videos)}] Processing video...")
         
         if download_sub(video):
+            add_video_to_firebase(video)
             successful_downloads += 1
         else:
             failed_downloads += 1
-            # Still add to Firebase to avoid reprocessing failed videos
-            add_video_to_firebase(video)
         
         # Add delay between video processing to avoid rate limiting
         if i < len(truly_new_videos):
