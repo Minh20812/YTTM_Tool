@@ -80,12 +80,18 @@ def process_srt_file(input_file, output_file):
 
 def main():
     """Hàm main xử lý tất cả file .vi.srt trong thư mục storage cùng cấp với thư mục cha"""
-    # Lấy đường dẫn của thư mục cha
-    current_dir = os.getcwd()
-    parent_dir = os.path.dirname(current_dir)
+    # Lấy đường dẫn tuyệt đối của script hiện tại
+    script_dir = os.path.dirname(os.path.abspath(__file__))
     
-    # Đường dẫn đến thư mục storage
+    # Lấy thư mục cha của script
+    parent_dir = os.path.dirname(script_dir)
+    
+    # Đường dẫn đến thư mục storage (cùng cấp với thư mục cha)
     storage_dir = os.path.join(parent_dir, 'storage')
+    
+    print(f"Thư mục script: {script_dir}")
+    print(f"Thư mục cha: {parent_dir}")
+    print(f"Thư mục storage: {storage_dir}")
     
     # Kiểm tra xem thư mục storage có tồn tại không
     if not os.path.exists(storage_dir):
@@ -102,8 +108,9 @@ def main():
     
     processed_count = 0
     
+    print(f"\nTìm thấy {len(input_files)} file .vi.srt:")
     for input_file in input_files:
-        print(f"Đang xử lý file: {input_file}")
+        print(f"Đang xử lý file: {os.path.basename(input_file)}")
         
         # Lấy tên file không có đường dẫn
         filename = os.path.basename(input_file)
@@ -114,13 +121,13 @@ def main():
         
         # Xử lý file
         if process_srt_file(input_file, output_file):
-            print(f"  - Đã tạo file: {output_file}")
+            print(f"  ✓ Đã tạo file: {os.path.basename(output_file)}")
             processed_count += 1
         else:
-            print(f"  - Lỗi khi xử lý file: {input_file}")
+            print(f"  ✗ Lỗi khi xử lý file: {filename}")
     
     print(f"\nHoàn thành! Đã xử lý {processed_count}/{len(input_files)} file.")
-    print(f"Thư mục storage: {storage_dir}")
+    print(f"Các file đã được lưu trong: {storage_dir}")
 
 if __name__ == "__main__":
     main()

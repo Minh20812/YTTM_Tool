@@ -5,7 +5,7 @@ def run_pipeline():
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     python_exe = "python"
 
-    subprocess.run([python_exe, os.path.join("src", "youtube", "download_vi_subtitles.py")])
+    subprocess.run([python_exe, os.path.join("src", "youtube", "download_vi_subtitles2.py")])
     subprocess.run([python_exe, os.path.join("src", "subtitle", "spaceSrt_cleaner.py")])
     subprocess.run([python_exe, os.path.join("src", "subtitle", "spaceSrt_cleaner2.py")])
     subprocess.run([python_exe, os.path.join("src", "subtitle", "spaceSrt_cleaner3.py")])

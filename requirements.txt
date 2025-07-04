@@ -5,3 +5,5 @@ internetarchive
 firebase_admin
 pydub
 python-dotenv
+feedparser
+requests
