@@ -18,7 +18,7 @@ def run_download_script():
     # Chạy script download
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     python_exe = "python"
-    download_script = os.path.join("src", "youtube", "download_vi_subtitles2.py")
+    download_script = os.path.join("src", "youtube", "download_vi_subtitles3.py")
     
     try:
         # Chạy script download với capture output để theo dõi
