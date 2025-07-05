@@ -222,6 +222,21 @@ def download_sub(video_data, cookies_file=None, max_retries=2):
 
     video_id = info.get("id")
     title = info.get("title", "Unknown Title")
+    
+    # Debug: Print video info keys to understand what's available
+    print(f"🔍 Video ID: {video_id}")
+    print(f"🔍 Available keys in info: {list(info.keys())}")
+    
+    # Check if subtitles are available
+    available_subs = info.get("subtitles", {})
+    auto_subs = info.get("automatic_captions", {})
+    
+    print(f"🔍 Available subtitles: {list(available_subs.keys()) if available_subs else 'None'}")
+    print(f"🔍 Auto captions: {list(auto_subs.keys()) if auto_subs else 'None'}")
+    
+    if not available_subs and not auto_subs:
+        print("⚠️ No subtitles available for this video")
+        return False
 
     sub_lang, is_user_sub = choose_sub_lang(info)
     suffix = sub_lang + (".cleansub" if is_user_sub else "")
@@ -241,14 +256,6 @@ def download_sub(video_data, cookies_file=None, max_retries=2):
     if os.path.exists(final_output):
         print(f"⚠️ Skipping download (file exists): {final_output}")
         return True
-
-    # Check if subtitles are available
-    available_subs = info.get("subtitles", {})
-    auto_subs = info.get("automatic_captions", {})
-    
-    if not available_subs and not auto_subs:
-        print("⚠️ No subtitles available for this video")
-        return False
 
     for attempt in range(max_retries):
         try:
