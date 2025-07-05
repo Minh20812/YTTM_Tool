@@ -8,6 +8,7 @@ import firebase_admin
 from firebase_admin import credentials, firestore
 import time
 import random
+import tempfile
 # Thay thế import get_latest_video2 bằng script RSS reader
 from src.youtube.rss_reader import get_latest_videos_from_rss
 
@@ -22,6 +23,34 @@ def ensure_storage_directory():
         print(f"📁 Created storage directory: {STORAGE_DIR}")
     else:
         print(f"📁 Using storage directory: {STORAGE_DIR}")
+
+def create_cookies_file():
+    """Tạo file cookies từ COOKIES_CONTENT trong .env"""
+    cookies_content = os.getenv('COOKIES_CONTENT')
+    if not cookies_content:
+        print("⚠️ No COOKIES_CONTENT found in .env file")
+        return None
+    
+    try:
+        # Tạo temporary file cho cookies
+        cookies_file = tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.txt')
+        cookies_file.write(cookies_content)
+        cookies_file.close()
+        
+        print(f"🍪 Created cookies file: {cookies_file.name}")
+        return cookies_file.name
+    except Exception as e:
+        print(f"❌ Error creating cookies file: {e}")
+        return None
+
+def cleanup_cookies_file(cookies_file_path):
+    """Xóa file cookies tạm thời"""
+    if cookies_file_path and os.path.exists(cookies_file_path):
+        try:
+            os.unlink(cookies_file_path)
+            print(f"🧹 Cleaned up cookies file: {cookies_file_path}")
+        except Exception as e:
+            print(f"⚠️ Error cleaning up cookies file: {e}")
 
 def initialize_firebase():
     """Initialize Firebase connection using environment variable"""
@@ -91,8 +120,8 @@ def add_video_to_firebase(video_data):
     db.collection("latest_video_links").add(video_doc)
     print(f"✅ Added to Firebase: {video_data.get('title', 'Unknown')[:50]}...")
 
-def get_video_info(video_url, max_retries=3):
-    """Get video information using yt-dlp with improved error handling"""
+def get_video_info(video_url, cookies_file=None, max_retries=3):
+    """Get video information using yt-dlp with improved error handling and cookies support"""
     for attempt in range(max_retries):
         try:
             # Add delay between retries to avoid rate limiting
@@ -101,7 +130,7 @@ def get_video_info(video_url, max_retries=3):
                 print(f"⏳ Waiting {delay:.1f}s before retry #{attempt + 1}...")
                 time.sleep(delay)
             
-            # Improved yt-dlp command with better error handling
+            # Improved yt-dlp command with better error handling and cookies support
             cmd = [
                 "yt-dlp",
                 "--skip-download",
@@ -111,8 +140,14 @@ def get_video_info(video_url, max_retries=3):
                 "--no-check-certificate",
                 "--socket-timeout", "30",
                 "--retries", "3",
-                video_url
             ]
+            
+            # Add cookies if available
+            if cookies_file and os.path.exists(cookies_file):
+                cmd.extend(["--cookies", cookies_file])
+                print(f"🍪 Using cookies file for authentication")
+            
+            cmd.append(video_url)
             
             print(f"🔍 Attempt {attempt + 1}: Fetching video info...")
             
@@ -173,14 +208,14 @@ def choose_sub_lang(info):
     else:
         return ("vi", False)
 
-def download_sub(video_data, max_retries=2):
-    """Download subtitle for a single video with improved error handling"""
+def download_sub(video_data, cookies_file=None, max_retries=2):
+    """Download subtitle for a single video with improved error handling and cookies support"""
     video_url = video_data.get('url')
     if not video_url:
         print("⚠️ No URL found in video data")
         return False
 
-    info = get_video_info(video_url)
+    info = get_video_info(video_url, cookies_file)
     if not info:
         print("❌ Could not fetch video information")
         return False
@@ -234,8 +269,13 @@ def download_sub(video_data, max_retries=2):
                 "--socket-timeout", "30",
                 "--retries", "3",
                 "--ignore-errors",
-                video_url
             ]
+            
+            # Add cookies if available
+            if cookies_file and os.path.exists(cookies_file):
+                cmd.extend(["--cookies", cookies_file])
+            
+            cmd.append(video_url)
             
             result = subprocess.run(cmd, 
                                   check=True, 
@@ -286,72 +326,81 @@ def process_new_videos(hours=36, skip_shorts=True):
     # Đảm bảo thư mục storage tồn tại
     ensure_storage_directory()
     
-    # Step 1: Get latest videos from YouTube channels using RSS reader
-    print("📺 Fetching latest videos from YouTube RSS feeds...")
+    # Tạo cookies file từ environment variable
+    cookies_file = create_cookies_file()
+    
     try:
-        new_videos = get_latest_videos_from_rss(
-            return_links=True,
-            hours=hours,
-            skip_shorts=skip_shorts
-        )
-    except Exception as e:
-        print(f"❌ Error fetching videos from RSS: {e}")
-        return
-    
-    if not new_videos:
-        print("❌ No new videos found from YouTube RSS feeds")
-        return
-    
-    print(f"📋 Found {len(new_videos)} videos from RSS scan")
-    
-    # Step 2: Get existing URLs from Firebase
-    existing_urls = get_existing_video_urls_from_firebase()
-    
-    # Step 3: Filter out videos that already exist in Firebase
-    truly_new_videos = []
-    for video in new_videos:
-        if video.get('url') not in existing_urls:
-            truly_new_videos.append(video)
-            print(f"🆕 New video: {video.get('title', 'Unknown')[:50]}...")
-        else:
-            print(f"⏭️ Already exists: {video.get('title', 'Unknown')[:50]}...")
-    
-    if not truly_new_videos:
-        print("✅ All videos already exist in Firebase - nothing to download")
-        return
-    
-    print(f"\n🎯 Processing {len(truly_new_videos)} truly new videos...")
-    
-    # Step 4: Download subtitles for new videos
-    successful_downloads = 0
-    failed_downloads = 0
-    
-    for i, video in enumerate(truly_new_videos, 1):
-        print(f"\n[{i}/{len(truly_new_videos)}] Processing video...")
+        # Step 1: Get latest videos from YouTube channels using RSS reader
+        print("📺 Fetching latest videos from YouTube RSS feeds...")
+        try:
+            new_videos = get_latest_videos_from_rss(
+                return_links=True,
+                hours=hours,
+                skip_shorts=skip_shorts
+            )
+        except Exception as e:
+            print(f"❌ Error fetching videos from RSS: {e}")
+            return
         
-        if download_sub(video):
-            add_video_to_firebase(video)
-            successful_downloads += 1
-        else:
-            failed_downloads += 1
+        if not new_videos:
+            print("❌ No new videos found from YouTube RSS feeds")
+            return
         
-        # Add delay between video processing to avoid rate limiting
-        if i < len(truly_new_videos):
-            delay = random.uniform(1, 3)
-            print(f"⏳ Waiting {delay:.1f}s before processing next video...")
-            time.sleep(delay)
-    
-    # Step 5: Summary
-    print("\n" + "="*60)
-    print(f"📊 PROCESSING SUMMARY:")
-    print(f"   📺 Total videos from RSS: {len(new_videos)}")
-    print(f"   🆕 Truly new videos: {len(truly_new_videos)}")
-    print(f"   ✅ Successful downloads: {successful_downloads}")
-    print(f"   ❌ Failed downloads: {failed_downloads}")
-    print(f"   📁 Storage location: {STORAGE_DIR}")
-    print(f"   ⏰ Time window: {hours} hours")
-    print(f"   🎬 Skip shorts: {skip_shorts}")
-    print("="*60)
+        print(f"📋 Found {len(new_videos)} videos from RSS scan")
+        
+        # Step 2: Get existing URLs from Firebase
+        existing_urls = get_existing_video_urls_from_firebase()
+        
+        # Step 3: Filter out videos that already exist in Firebase
+        truly_new_videos = []
+        for video in new_videos:
+            if video.get('url') not in existing_urls:
+                truly_new_videos.append(video)
+                print(f"🆕 New video: {video.get('title', 'Unknown')[:50]}...")
+            else:
+                print(f"⏭️ Already exists: {video.get('title', 'Unknown')[:50]}...")
+        
+        if not truly_new_videos:
+            print("✅ All videos already exist in Firebase - nothing to download")
+            return
+        
+        print(f"\n🎯 Processing {len(truly_new_videos)} truly new videos...")
+        
+        # Step 4: Download subtitles for new videos
+        successful_downloads = 0
+        failed_downloads = 0
+        
+        for i, video in enumerate(truly_new_videos, 1):
+            print(f"\n[{i}/{len(truly_new_videos)}] Processing video...")
+            
+            if download_sub(video, cookies_file):
+                successful_downloads += 1
+            else:
+                failed_downloads += 1
+            
+            # Add delay between video processing to avoid rate limiting
+            if i < len(truly_new_videos):
+                delay = random.uniform(1, 3)
+                print(f"⏳ Waiting {delay:.1f}s before processing next video...")
+                time.sleep(delay)
+        
+        # Step 5: Summary
+        print("\n" + "="*60)
+        print(f"📊 PROCESSING SUMMARY:")
+        print(f"   📺 Total videos from RSS: {len(new_videos)}")
+        print(f"   🆕 Truly new videos: {len(truly_new_videos)}")
+        print(f"   ✅ Successful downloads: {successful_downloads}")
+        print(f"   ❌ Failed downloads: {failed_downloads}")
+        print(f"   📁 Storage location: {STORAGE_DIR}")
+        print(f"   ⏰ Time window: {hours} hours")
+        print(f"   🎬 Skip shorts: {skip_shorts}")
+        print(f"   🍪 Cookies used: {'Yes' if cookies_file else 'No'}")
+        print("="*60)
+        
+    finally:
+        # Cleanup cookies file
+        if cookies_file:
+            cleanup_cookies_file(cookies_file)
 
 def download_from_list_fallback(file_path="latest_video_links.txt"):
     """Fallback method to download from text file (original functionality)"""
@@ -361,22 +410,30 @@ def download_from_list_fallback(file_path="latest_video_links.txt"):
     
     # Đảm bảo thư mục storage tồn tại
     ensure_storage_directory()
-        
-    with open(file_path, "r") as f:
-        urls = [line.strip() for line in f if line.strip()]
+    
+    # Tạo cookies file
+    cookies_file = create_cookies_file()
+    
+    try:
+        with open(file_path, "r") as f:
+            urls = [line.strip() for line in f if line.strip()]
 
-    print(f"\n📋 Processing {len(urls)} video(s) from file...")
-    for i, url in enumerate(urls, 1):
-        print(f"\n[{i}/{len(urls)}] Processing URL: {url}")
-        # Create video data structure for compatibility
-        video_data = {'url': url}
-        download_sub(video_data)
-        
-        # Add delay between downloads
-        if i < len(urls):
-            delay = random.uniform(1, 3)
-            print(f"⏳ Waiting {delay:.1f}s before next download...")
-            time.sleep(delay)
+        print(f"\n📋 Processing {len(urls)} video(s) from file...")
+        for i, url in enumerate(urls, 1):
+            print(f"\n[{i}/{len(urls)}] Processing URL: {url}")
+            # Create video data structure for compatibility
+            video_data = {'url': url}
+            download_sub(video_data, cookies_file)
+            
+            # Add delay between downloads
+            if i < len(urls):
+                delay = random.uniform(1, 3)
+                print(f"⏳ Waiting {delay:.1f}s before next download...")
+                time.sleep(delay)
+    finally:
+        # Cleanup cookies file
+        if cookies_file:
+            cleanup_cookies_file(cookies_file)
 
 if __name__ == "__main__":
     import sys
