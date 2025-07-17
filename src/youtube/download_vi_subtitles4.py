@@ -1,6 +1,7 @@
 import subprocess
 import json
 import os
+from dotenv import load_dotenv
 import firebase_admin
 from firebase_admin import credentials, firestore
 from youtube_rss_fetcher import get_latest_videos_from_rss
@@ -9,15 +10,31 @@ from youtube_transcript_api.formatters import SRTFormatter
 from youtube_transcript_api._errors import NoTranscriptFound, TranscriptsDisabled
 import re
 
+# Load environment variables
+load_dotenv()
+
 def initialize_firebase():
-    """Initialize Firebase connection"""
+    """Initialize Firebase connection using environment variable"""
     try:
         # Check if Firebase is already initialized
         firebase_admin.get_app()
     except ValueError:
         # Initialize if not already done
-        cred = credentials.Certificate("./serviceAccountKey.json")
-        firebase_admin.initialize_app(cred)
+        firebase_key = os.getenv("FIREBASE_SERVICE_ACCOUNT_KEY")
+        
+        if not firebase_key:
+            raise ValueError("FIREBASE_SERVICE_ACCOUNT_KEY environment variable is not set")
+        
+        try:
+            # Parse the JSON string from environment variable
+            service_account_info = json.loads(firebase_key)
+            cred = credentials.Certificate(service_account_info)
+            firebase_admin.initialize_app(cred)
+            print("✅ Firebase initialized successfully from environment variable")
+        except json.JSONDecodeError as e:
+            raise ValueError(f"Invalid JSON in FIREBASE_SERVICE_ACCOUNT_KEY: {e}")
+        except Exception as e:
+            raise ValueError(f"Error initializing Firebase: {e}")
     
     return firestore.client()
 
@@ -323,6 +340,37 @@ def debug_firebase_urls():
         print(f"   Normalized: {normalize_youtube_url(url)}")
         print()
 
+def test_firebase_connection():
+    """Test Firebase connection with environment variable"""
+    print("🧪 Testing Firebase connection...")
+    
+    firebase_key = os.getenv("FIREBASE_SERVICE_ACCOUNT_KEY")
+    
+    if not firebase_key:
+        print("❌ FIREBASE_SERVICE_ACCOUNT_KEY environment variable is not set")
+        return False
+    
+    try:
+        service_account_info = json.loads(firebase_key)
+        print("✅ Firebase service account key is valid JSON")
+        
+        # Test Firebase connection
+        db = initialize_firebase()
+        print("✅ Firebase connection successful")
+        
+        # Test reading from collection
+        docs = list(db.collection("latest_video_links").limit(1).stream())
+        print(f"✅ Successfully connected to Firestore collection")
+        
+        return True
+        
+    except json.JSONDecodeError as e:
+        print(f"❌ Invalid JSON in FIREBASE_SERVICE_ACCOUNT_KEY: {e}")
+        return False
+    except Exception as e:
+        print(f"❌ Firebase connection failed: {e}")
+        return False
+
 if __name__ == "__main__":
     import sys
     
@@ -336,6 +384,9 @@ if __name__ == "__main__":
     elif len(sys.argv) > 1 and sys.argv[1] == "--test":
         # Test RSS integration
         test_rss_integration()
+    elif len(sys.argv) > 1 and sys.argv[1] == "--test-firebase":
+        # Test Firebase connection
+        test_firebase_connection()
     else:
         # Use new RSS-integrated method
         process_new_videos()
