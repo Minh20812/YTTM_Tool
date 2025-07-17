@@ -7,3 +7,4 @@ pydub
 python-dotenv
 feedparser
 requests
+youtube-transcript-api
