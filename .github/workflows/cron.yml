@@ -1,8 +1,8 @@
 name: YoutubeTM Cron Job
 
 on:
-  schedule:
-    - cron: "0 3 * * *" # 10h sáng mỗi ngày
+  # schedule:
+  #   - cron: "0 3 * * *" # 10h sáng mỗi ngày
   workflow_dispatch: # Cho phép chạy thủ công từ GitHub UI
 
 jobs:
