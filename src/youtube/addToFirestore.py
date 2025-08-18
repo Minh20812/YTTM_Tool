@@ -167,7 +167,6 @@ def process_new_videos_optimized():
             return_links=True,
             hours=36,  # Quét video trong 36 giờ qua
             skip_shorts=True,  # Bỏ qua Shorts
-            extract_thumbnails=True
         )
     except Exception as e:
         print(f"❌ Error fetching videos from RSS: {e}")
@@ -398,7 +397,6 @@ def process_new_videos():
             return_links=True,
             hours=36,  # Quét video trong 36 giờ qua
             skip_shorts=True,  # Bỏ qua Shorts
-            extract_thumbnails=True
         )
     except Exception as e:
         print(f"❌ Error fetching videos from RSS: {e}")
