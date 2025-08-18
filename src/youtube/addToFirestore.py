@@ -16,8 +16,12 @@ def initialize_firebase():
         firebase_admin.get_app()
     except ValueError:
         # Initialize if not already done
-        service_account_path = os.getenv('FIREBASE_SERVICE_ACCOUNT_KEY')
-        cred = credentials.Certificate(service_account_path)
+        service_account_json = os.getenv('FIREBASE_SERVICE_ACCOUNT_KEY')
+        if not service_account_json:
+            raise ValueError("FIREBASE_SERVICE_ACCOUNT_KEY environment variable not set")
+        # Parse JSON string thành dict
+        service_account_info = json.loads(service_account_json)
+        cred = credentials.Certificate(service_account_info)
         firebase_admin.initialize_app(cred)
     
     return firestore.client()
