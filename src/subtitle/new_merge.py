@@ -110,7 +110,7 @@ def process_file_set(base_name, storage_dir):
         print(f"  ✓ Hoàn thành: {output_srt}")
         return True
     except Exception as e:
-        print(f"  ✗ Lỗi khi xử lý {base_name}: {e}")
+        print(f"  ✗ [ERROR] khi xử lý {base_name}: {e}")
         return False
 
 def find_base_names(storage_dir):

@@ -54,7 +54,7 @@ def get_recent_video_urls_from_firebase(days_back=2):
             normalized_url = normalize_youtube_url(url)
             existing_urls.add(normalized_url)
     
-    print(f"📚 Found {len(existing_urls)} existing videos in the last {days_back} days ({doc_count} documents checked)")
+    print(f"Found {len(existing_urls)} existing videos in the last {days_back} days ({doc_count} documents checked)")
     return existing_urls
 
 def get_recent_video_data_from_firebase(days_back=2):
@@ -93,7 +93,7 @@ def get_recent_video_data_from_firebase(days_back=2):
         if video_id:
             existing_data['video_ids'].add(video_id)
     
-    print(f"📚 Found {len(existing_data['urls'])} URLs and {len(existing_data['video_ids'])} video IDs in the last {days_back} days")
+    print(f"Found {len(existing_data['urls'])} URLs and {len(existing_data['video_ids'])} video IDs in the last {days_back} days")
     return existing_data
 
 def normalize_youtube_url(url):
@@ -162,10 +162,10 @@ def process_new_videos_optimized():
     """
     Optimized version that only checks recent videos for duplicates
     """
-    print("🚀 Starting optimized new video processing with RSS feeds...")
+    print("Starting optimized new video processing with RSS feeds...")
     
     # Step 1: Get latest videos from YouTube RSS feeds
-    print("📡 Fetching latest videos from YouTube RSS feeds...")
+    print("Fetching latest videos from YouTube RSS feeds...")
     try:
         new_videos = get_latest_videos_from_rss(
             return_links=True,
@@ -173,17 +173,17 @@ def process_new_videos_optimized():
             skip_shorts=True,  # Bỏ qua Shorts
         )
     except Exception as e:
-        print(f"❌ Error fetching videos from RSS: {e}")
+        print(f"Error fetching videos from RSS: {e}")
         return
     
     if not new_videos:
-        print("❌ No new videos found from RSS feeds")
+        print("No new videos found from RSS feeds")
         return
     
-    print(f"📋 Found {len(new_videos)} videos from RSS scan")
+    print(f"Found {len(new_videos)} videos from RSS scan")
     
     # Step 2: Get existing video data from Firebase (last 2 days only)
-    print("\n📚 Checking recent videos in Firebase (last 2 days)...")
+    print("Checking recent videos in Firebase (last 2 days)...")
     existing_data = get_recent_video_data_from_firebase(days_back=2)
     
     # Step 3: Filter out duplicates using optimized check
@@ -193,27 +193,27 @@ def process_new_videos_optimized():
     for video in new_videos:
         is_duplicate, match_reason = is_video_duplicate_optimized(video, existing_data)
         
-        print(f"\n🔍 Checking: {video.get('title', 'Unknown')[:50]}...")
+        print(f"Checking: {video.get('title', 'Unknown')[:50]}...")
         print(f"   Channel: {video.get('channel', 'Unknown')}")
         print(f"   Video ID: {video.get('video_id', extract_video_id_from_url(video.get('url', '')))}")
         
         if is_duplicate:
             duplicate_count += 1
-            print(f"⏭️ DUPLICATE ({match_reason}) - Skipping...")
+            print(f"DUPLICATE ({match_reason}) - Skipping...")
         else:
             truly_new_videos.append(video)
-            print(f"🆕 NEW - Will add to Firebase...")
+            print(f"NEW - Will add to Firebase...")
     
     if not truly_new_videos:
-        print(f"✅ All {len(new_videos)} videos are duplicates ({duplicate_count} found) - nothing to add")
+        print(f"All {len(new_videos)} videos are duplicates ({duplicate_count} found) - nothing to add")
         # Still save empty file to clear previous content
         save_new_video_links_to_file([])
         return
     
-    print(f"\n🎯 Found {len(truly_new_videos)} truly new videos (skipped {duplicate_count} duplicates)")
+    print(f"Found {len(truly_new_videos)} truly new videos (skipped {duplicate_count} duplicates)")
     
     # Step 4: Save new video links to file BEFORE adding to Firebase
-    print(f"\n💾 Saving {len(truly_new_videos)} new video links to file...")
+    print(f"Saving {len(truly_new_videos)} new video links to file...")
     save_new_video_links_to_file(truly_new_videos)
     
     # Step 5: Add new videos to Firebase
@@ -230,13 +230,13 @@ def process_new_videos_optimized():
     
     # Step 6: Summary
     print("\n" + "="*60)
-    print(f"📊 OPTIMIZED PROCESSING SUMMARY:")
-    print(f"   📡 Total videos from RSS: {len(new_videos)}")
-    print(f"   🔄 Duplicates found (last 2 days): {duplicate_count}")
-    print(f"   🆕 Truly new videos: {len(truly_new_videos)}")
-    print(f"   💾 New videos saved to file: {len(truly_new_videos)}")
-    print(f"   ✅ Successfully added to Firebase: {successful_adds}")
-    print(f"   ❌ Failed to add to Firebase: {failed_adds}")
+    print(f"OPTIMIZED PROCESSING SUMMARY:")
+    print(f"   Total videos from RSS: {len(new_videos)}")
+    print(f"   Duplicates found (last 2 days): {duplicate_count}")
+    print(f"   Truly new videos: {len(truly_new_videos)}")
+    print(f"   New videos saved to file: {len(truly_new_videos)}")
+    print(f"   Successfully added to Firebase: {successful_adds}")
+    print(f"   Failed to add to Firebase: {failed_adds}")
     print("="*60)
 
 def add_video_to_firebase(video_data):
@@ -299,10 +299,10 @@ def add_video_to_firebase(video_data):
         db.collection("latest_video_links").add(video_doc)
         subtitle_info = f" [Subtitles: {video_data.get('subtitle_codes', 'vi')}]"
         thumbnail_info = f" [Thumbnail: {video_data.get('thumbnail_quality', 'N/A')}]" if video_data.get('thumbnail') else ""
-        print(f"✅ Added to Firebase: {title[:50]}...{subtitle_info}{thumbnail_info}")
+        print(f"Added to Firebase: {title[:50]}...{subtitle_info}{thumbnail_info}")
         return True
     except Exception as e:
-        print(f"❌ Failed to add to Firebase: {e}")
+        print(f"Failed to add to Firebase: {e}")
         return False
 
 def get_video_info(video_url):
@@ -317,10 +317,10 @@ def get_video_info(video_url):
         )
         return json.loads(result.stdout)
     except subprocess.TimeoutExpired:
-        print(f"⏱️ Timeout fetching info for {video_url}")
+        print(f"Timeout fetching info for {video_url}")
         return None
     except Exception as e:
-        print(f"⚠️ Error fetching info for {video_url}: {e}")
+        print(f"Error fetching info for {video_url}: {e}")
         return None
 
 
@@ -392,10 +392,10 @@ def process_new_videos():
     """
     Main function to process new videos with optimized duplicate checking
     """
-    print("🚀 Starting optimized new video processing...")
+    print("Starting optimized new video processing...")
     
     # Step 1: Get latest videos from YouTube RSS feeds
-    print("📡 Fetching latest videos from YouTube RSS feeds...")
+    print("Fetching latest videos from YouTube RSS feeds...")
     try:
         new_videos = get_latest_videos_from_rss(
             return_links=True,
@@ -403,17 +403,17 @@ def process_new_videos():
             skip_shorts=True,  # Bỏ qua Shorts
         )
     except Exception as e:
-        print(f"❌ Error fetching videos from RSS: {e}")
+        print(f"Error fetching videos from RSS: {e}")
         return
     
     if not new_videos:
-        print("❌ No new videos found from RSS feeds")
+        print("No new videos found from RSS feeds")
         return
     
-    print(f"📋 Found {len(new_videos)} videos from RSS scan")
+    print(f"Found {len(new_videos)} videos from RSS scan")
     
     # Step 2: Get existing video data from Firebase (last 2 days only) 
-    print("\n📚 Checking recent videos in Firebase (last 2 days)...")
+    print("Checking recent videos in Firebase (last 2 days)...")
     existing_data = get_recent_video_data_from_firebase(days_back=2)
     
     # Step 3: Filter out duplicates using optimized check
@@ -427,22 +427,22 @@ def process_new_videos():
         channel = video.get('channel', 'Unknown')
         video_id = video.get('video_id') or extract_video_id_from_url(video.get('url', ''))
         
-        print(f"\n🔍 Checking: {video_title}...")
-        print(f"   📺 Channel: {channel}")
-        print(f"   🆔 Video ID: {video_id}")
+        print(f"Checking: {video_title}...")
+        print(f"Channel: {channel}")
+        print(f"Video ID: {video_id}")
         
         if is_duplicate:
             duplicate_count += 1
-            print(f"⏭️ DUPLICATE ({match_reason}) - Skipping...")
+            print(f"DUPLICATE ({match_reason}) - Skipping...")
         else:
             truly_new_videos.append(video)
-            print(f"🆕 NEW - Will add to Firebase...")
+            print(f"NEW - Will add to Firebase...")
     
     if not truly_new_videos:
-        print(f"✅ All {len(new_videos)} videos are duplicates ({duplicate_count} found) - nothing to add")
+        print(f"All {len(new_videos)} videos are duplicates ({duplicate_count} found) - nothing to add")
         return
     
-    print(f"\n🎯 Found {len(truly_new_videos)} truly new videos (skipped {duplicate_count} duplicates)")
+    print(f"Found {len(truly_new_videos)} truly new videos (skipped {duplicate_count} duplicates)")
     
     # Step 4: Add new videos to Firebase
     successful_adds = 0
@@ -458,14 +458,14 @@ def process_new_videos():
     
     # Step 6: Summary
     print("\n" + "="*70)
-    print(f"📊 OPTIMIZED PROCESSING SUMMARY:")
-    print(f"   📡 Total videos from RSS: {len(new_videos)}")
-    print(f"   🔄 Duplicates found (last 2 days check): {duplicate_count}")
-    print(f"   🆕 Truly new videos: {len(truly_new_videos)}")
-    print(f"   💾 New videos saved to file: {len(truly_new_videos)}")
-    print(f"   ✅ Successfully added to Firebase: {successful_adds}")
-    print(f"   ❌ Failed to add to Firebase: {failed_adds}")
-    print(f"   ⚡ Performance: Only checked last 2 days instead of all videos")
+    print(f"OPTIMIZED PROCESSING SUMMARY:")
+    print(f"   Total videos from RSS: {len(new_videos)}")
+    print(f"   Duplicates found (last 2 days check): {duplicate_count}")
+    print(f"   Truly new videos: {len(truly_new_videos)}")
+    print(f"   New videos saved to file: {len(truly_new_videos)}")
+    print(f"   Successfully added to Firebase: {successful_adds}")
+    print(f"   Failed to add to Firebase: {failed_adds}")
+    print(f"   Performance: Only checked last 2 days instead of all videos")
     print("="*70)
 
 # Debug functions for the optimized version
@@ -492,12 +492,12 @@ def debug_recent_videos(days_back=2):
         created_at = data.get("createdAt")
         
         print(f"{count}. [{channel}] {title[:50]}...")
-        print(f"   🆔 Video ID: {video_id}")
-        print(f"   🔗 URL: {url}")
-        print(f"   📅 Created: {created_at}")
+        print(f"   Video ID: {video_id}")
+        print(f"   URL: {url}")
+        print(f"   Created: {created_at}")
         print()
     
-    print(f"📊 Total recent videos (last {days_back} days): {count}")
+    print(f"Total recent videos (last {days_back} days): {count}")
 
 if __name__ == "__main__":
     import sys

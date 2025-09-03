@@ -75,7 +75,7 @@ def process_srt_file(input_file, output_file):
         return True
         
     except Exception as e:
-        print(f"Lỗi khi xử lý file {input_file}: {str(e)}")
+        print(f"[ERROR] khi xử lý file {input_file}: {str(e)}")
         return False
 
 def main():
@@ -124,7 +124,7 @@ def main():
             print(f"  ✓ Đã tạo file: {os.path.basename(output_file)}")
             processed_count += 1
         else:
-            print(f"  ✗ Lỗi khi xử lý file: {filename}")
+            print(f"  ✗ [ERROR] khi xử lý file: {filename}")
     
     print(f"\nHoàn thành! Đã xử lý {processed_count}/{len(input_files)} file.")
     print(f"Các file đã được lưu trong: {storage_dir}")

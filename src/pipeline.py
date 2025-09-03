@@ -242,7 +242,7 @@ def run_pipeline():
         print("❌ Script bị timeout (quá 5 phút)")
         return False
     except Exception as e:
-        print(f"❌ Lỗi không mong muốn: {e}")
+        print(f"❌ [ERROR] không mong muốn: {e}")
         return False
 
 if __name__ == "__main__":

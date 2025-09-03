@@ -117,7 +117,7 @@ def main():
             process_srt_file(str(input_file), str(output_file))
             processed_count += 1
         except Exception as e:
-            print(f"✗ Lỗi khi xử lý {input_file}: {str(e)}")
+            print(f"✗ [ERROR] khi xử lý {input_file}: {str(e)}")
 
     print(f"\n🎉 Hoàn thành! Đã xử lý thành công {processed_count}/{len(all_files)} file.")
 

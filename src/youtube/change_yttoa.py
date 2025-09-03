@@ -3,15 +3,15 @@ import os
 
 def convert_youtube_to_archive(youtube_url):
     """
-    Chuyển đổi URL từ YouTube sang archive.org
+    Convert YouTube URL to archive.org URL
     
     Args:
-        youtube_url (str): URL từ YouTube
+        youtube_url (str): URL from YouTube
         
     Returns:
-        str: URL archive.org tương ứng
+        str: Corresponding archive.org URL
     """
-    # Pattern để match YouTube URL
+    # Patterns to match YouTube URLs
     patterns = [
         r'https://www\.youtube\.com/watch\?v=([^&\s]+)',
         r'https://youtu\.be/([^?&\s]+)',
@@ -29,17 +29,17 @@ def convert_youtube_to_archive(youtube_url):
     if not video_id:
         return None
     
-    # Xử lý các trường hợp đặc biệt
+    # Handle special cases
     if video_id.startswith('-'):
-        # Trường hợp -R0fPJQr0qo -> a__R0fPJQr0qo
+        # Example: -R0fPJQr0qo -> a__R0fPJQr0qo
         folder_name = 'a_' + video_id.replace('-', '_')
         file_name = video_id.replace('-', '_') + '.ogg'
     elif video_id.startswith('_'):
-        # Trường hợp _wDIe0XEmwI -> a_wDIe0XEmwI
+        # Example: _wDIe0XEmwI -> a_wDIe0XEmwI
         folder_name = 'a' + video_id
         file_name = video_id + '.ogg'
     else:
-        # Trường hợp bình thường 0Wwn5IEqFcg
+        # Normal case
         folder_name = video_id
         file_name = video_id + '.ogg'
     
@@ -47,70 +47,70 @@ def convert_youtube_to_archive(youtube_url):
 
 def main():
     """
-    Hàm chính để đọc file, chuyển đổi link và ghi ra file mới
+    Main function to read file, convert links, and write results
     """
     input_file = 'link_youtube_recent_2days.txt'
     output_file = 'archive_links.txt'
     
-    # Kiểm tra file input có tồn tại không
+    # Check if input file exists
     if not os.path.exists(input_file):
-        print(f"Lỗi: Không tìm thấy file '{input_file}'")
-        print("Vui lòng tạo file 'link_youtube_recent_2days.txt' và thêm các link YouTube vào đó.")
+        print(f"[ERROR] File '{input_file}' not found")
+        print("Please create 'link_youtube_recent_2days.txt' and add YouTube links into it.")
         return
     
     converted_links = []
     skipped_links = []
     
     try:
-        # Đọc file input
+        # Read input file
         with open(input_file, 'r', encoding='utf-8') as f:
             lines = f.readlines()
         
-        print(f"Đang xử lý {len(lines)} link...")
+        print(f"[INFO] Processing {len(lines)} links...")
         
-        # Chuyển đổi từng link
+        # Convert each link
         for i, line in enumerate(lines, 1):
             line = line.strip()
-            if line:  # Bỏ qua dòng trống
+            if line:  # skip empty lines
                 archive_url = convert_youtube_to_archive(line)
                 if archive_url:
                     converted_links.append(archive_url)
-                    print(f"[{i}] ✓ Chuyển đổi thành công: {line[:50]}...")
+                    print(f"[{i}] OK Converted: {line[:50]}...")
                 else:
                     skipped_links.append(line)
-                    print(f"[{i}] ✗ Không thể chuyển đổi: {line}")
+                    print(f"[{i}] FAIL Cannot convert: {line}")
         
-        # Ghi file output
+        # Write output file
         with open(output_file, 'w', encoding='utf-8') as f:
             for link in converted_links:
                 f.write(link + '\n')
         
-        # Thống kê kết quả
-        print(f"\n=== KẾT QUẢ ===")
-        print(f"Tổng số link: {len(lines)}")
-        print(f"Chuyển đổi thành công: {len(converted_links)}")
-        print(f"Không thể chuyển đổi: {len(skipped_links)}")
-        print(f"File kết quả: '{output_file}'")
+        # Summary
+        print("\n=== SUMMARY ===")
+        print(f"Total links: {len(lines)}")
+        print(f"Converted successfully: {len(converted_links)}")
+        print(f"Failed to convert: {len(skipped_links)}")
+        print(f"Output file: '{output_file}'")
         
         if skipped_links:
-            print(f"\nCác link không thể chuyển đổi:")
+            print("\nLinks that could not be converted:")
             for link in skipped_links:
                 print(f"  - {link}")
         
-        # Hiển thị một vài ví dụ chuyển đổi
+        # Show some examples
         if converted_links:
-            print(f"\nVí dụ chuyển đổi:")
+            print("\nExamples of converted links:")
             for i, link in enumerate(converted_links[:3]):
                 print(f"  {i+1}. {link}")
     
     except FileNotFoundError:
-        print(f"Lỗi: Không thể đọc file '{input_file}'")
+        print(f"[ERROR] Cannot read file '{input_file}'")
     except Exception as e:
-        print(f"Lỗi: {str(e)}")
+        print(f"[ERROR] {str(e)}")
 
 def test_conversion():
     """
-    Hàm test để kiểm tra logic chuyển đổi
+    Test function to check conversion logic
     """
     test_cases = [
         "https://www.youtube.com/watch?v=0Wwn5IEqFcg",
@@ -121,7 +121,7 @@ def test_conversion():
         "https://youtu.be/_wDIe0XEmwI"
     ]
     
-    print("=== TEST CHUYỂN ĐỔI ===")
+    print("=== TEST CONVERSION ===")
     for url in test_cases:
         result = convert_youtube_to_archive(url)
         print(f"IN:  {url}")
@@ -129,7 +129,7 @@ def test_conversion():
         print()
 
 if __name__ == "__main__":
-    # Uncomment dòng dưới để test logic chuyển đổi
+    # Uncomment to test logic
     # test_conversion()
     
     main()

@@ -165,7 +165,7 @@ def process_file(input_file):
         return True
         
     except Exception as e:
-        print(f"Lỗi khi ghi file {output_file}: {e}")
+        print(f"[ERROR] khi ghi file {output_file}: {e}")
         return False
 
 def main():

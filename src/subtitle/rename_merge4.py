@@ -23,7 +23,7 @@ def rename_merge4_files(directory):
                 print(f"Đã đổi tên: {filename} -> {new_filename}")
                 renamed_count += 1
             except OSError as e:
-                print(f"Lỗi khi đổi tên file {filename}: {e}")
+                print(f"[ERROR] khi đổi tên file {filename}: {e}")
         else:
             print(f"Bỏ qua file (không bắt đầu bằng -): {filename}")
 

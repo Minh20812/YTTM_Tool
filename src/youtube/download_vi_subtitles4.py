@@ -199,7 +199,7 @@ def download_sub(video_data):
         print("❌ Video đã tắt phụ đề")
         return False
     except Exception as e:
-        print(f"❌ Lỗi: {e}")
+        print(f"❌ [ERROR]: {e}")
         return False
 
 def process_new_videos():

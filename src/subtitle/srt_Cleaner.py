@@ -165,7 +165,7 @@ def process_srt_file(input_file, output_file):
         print(f"Đã xử lý: {input_file} -> {output_file}")
         
     except Exception as e:
-        print(f"Lỗi khi xử lý file {input_file}: {str(e)}")
+        print(f"[ERROR] khi xử lý file {input_file}: {str(e)}")
 
 def main():
     """Hàm chính - xử lý tất cả file *.clean4.srt trong thư mục storage cùng cấp với thư mục cha"""
@@ -279,7 +279,7 @@ if __name__ == "__main__":
 #         print(f"Đã xử lý: {input_file} -> {output_file}")
         
 #     except Exception as e:
-#         print(f"Lỗi khi xử lý file {input_file}: {str(e)}")
+#         print(f"[ERROR] khi xử lý file {input_file}: {str(e)}")
 
 # def main():
 #     """Hàm chính - xử lý tất cả file *.clean4.srt"""

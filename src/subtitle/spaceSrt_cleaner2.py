@@ -181,7 +181,7 @@ if __name__ == "__main__":
                 filter_srt(input_file, output_file, min_duration_ms=100)
                 print(f"✓ Hoàn thành: {output_file}")
             except Exception as e:
-                print(f"✗ Lỗi khi xử lý {input_file}: {str(e)}")
+                print(f"✗ [ERROR] khi xử lý {input_file}: {str(e)}")
         print(f"\n=== Đã xử lý xong tất cả {len(input_files)} file(s) ===")
     
     # Nếu muốn gộp các subtitle liên tiếp thay vì chỉ lọc, 

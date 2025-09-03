@@ -37,7 +37,7 @@ def convert_mp3_to_ogg(input_file, output_file, quality=3):
         print(f"  📦 Kích thước: {original_size//1024}KB → {new_size//1024}KB (-{compression_ratio:.1f}%)")
         return True
     except Exception as e:
-        print(f"  ❌ Lỗi khi xử lý {input_file}: {str(e)}")
+        print(f"  ❌ [ERROR] khi xử lý {input_file}: {str(e)}")
         return False
 
 def main():
@@ -106,5 +106,5 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         print("\n\n⏹️  Đã dừng chuyển đổi theo yêu cầu người dùng.")
     except Exception as e:
-        print(f"\n❌ Lỗi không mong muốn: {str(e)}")
+        print(f"\n❌ [ERROR] không mong muốn: {str(e)}")
         print("💡 Hãy kiểm tra lại môi trường Python và thư viện pydub.")

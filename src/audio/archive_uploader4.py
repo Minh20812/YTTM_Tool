@@ -107,10 +107,10 @@ class YouTubeArchiveUploader:
             return video_info
             
         except requests.RequestException as e:
-            logger.error(f"❌ Lỗi khi gọi YouTube API: {str(e)}")
+            logger.error(f"❌ [ERROR] khi gọi YouTube API: {str(e)}")
             return None
         except Exception as e:
-            logger.error(f"❌ Lỗi không xác định khi lấy thông tin YouTube: {str(e)}")
+            logger.error(f"❌ [ERROR] không xác định khi lấy thông tin YouTube: {str(e)}")
             return None
 
     def format_duration(self, duration_iso):
@@ -419,7 +419,7 @@ class YouTubeArchiveUploader:
                 
             except Exception as e:
                 error_msg = str(e).lower()
-                logger.error(f"❌ Lỗi upload lần {attempt + 1}: {str(e)}")
+                logger.error(f"❌ [ERROR] upload lần {attempt + 1}: {str(e)}")
                 
                 if "spam" in error_msg or "reduce your request rate" in error_msg:
                     logger.error("🚫 Phát hiện spam detection!")
@@ -435,13 +435,13 @@ class YouTubeArchiveUploader:
                     
                 elif "connection" in error_msg or "timeout" in error_msg:
                     delay = 30 + (attempt * 10)
-                    logger.warning(f"🌐 Lỗi kết nối, đợi {delay} giây...")
+                    logger.warning(f"🌐 [ERROR] kết nối, đợi {delay} giây...")
                     self.wait_with_progress(delay, "Chờ kết nối")
                     continue
                     
                 else:
                     delay = 20 + (attempt * 10)
-                    logger.warning(f"🔄 Lỗi không xác định, đợi {delay} giây...")
+                    logger.warning(f"🔄 [ERROR] không xác định, đợi {delay} giây...")
                     self.wait_with_progress(delay, "Chờ thử lại")
         
         logger.error(f"❌ Upload thất bại sau {self.max_retries} lần thử: {filename}")
@@ -528,7 +528,7 @@ def main():
     except KeyboardInterrupt:
         logger.info("\n⛔ Đã dừng upload theo yêu cầu người dùng")
     except Exception as e:
-        logger.error(f"❌ Lỗi nghiêm trọng: {str(e)}")
+        logger.error(f"❌ [ERROR] nghiêm trọng: {str(e)}")
         sys.exit(1)
 
 if __name__ == "__main__":

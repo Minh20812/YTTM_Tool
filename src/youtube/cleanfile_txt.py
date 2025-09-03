@@ -5,4 +5,4 @@ import glob
 for pattern in ['*.txt']:
     for f in glob.glob(pattern):
         os.remove(f)
-        print(f"✓ Đã xóa {f}")
+        print(f"Deleted {f}")

@@ -127,7 +127,7 @@ def main():
                 output_file = process_srt_file(str(input_file))
                 processed_files.append(output_file)
             except Exception as e:
-                print(f"Lỗi khi xử lý {input_file}: {e}")
+                print(f"[ERROR] khi xử lý {input_file}: {e}")
         
         print(f"\nHoàn thành! Đã xử lý {len(processed_files)} file:")
         for file in processed_files:

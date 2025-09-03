@@ -31,10 +31,10 @@ def convert_to_mp3(srt_file, output_dir):
         )
         print(f"[✅] Đã tạo MP3: {mp3_file}")
     except subprocess.CalledProcessError as e:
-        print(f"[❌] Lỗi khi tạo {mp3_file}")
+        print(f"[❌] [ERROR] khi tạo {mp3_file}")
         print(f"     ↳ Trạng thái: {e.returncode}")
     except Exception as e:
-        print(f"[🔥] Lỗi không xác định khi xử lý {srt_file}: {e}")
+        print(f"[🔥] [ERROR] không xác định khi xử lý {srt_file}: {e}")
 
 def main():
     # Xác định thư mục storage cùng cấp với thư mục cha của script
@@ -90,10 +90,10 @@ if __name__ == "__main__":
 #         print(f"[📁] Đã chuyển vào thư mục '{output_folder}': {destination_path}")
 
 #     except subprocess.CalledProcessError as e:
-#         print(f"[❌] Lỗi khi tạo {mp3_file}")
+#         print(f"[❌] [ERROR] khi tạo {mp3_file}")
 #         print(f"     ↳ Trạng thái: {e.returncode}")
 #     except Exception as e:
-#         print(f"[🔥] Lỗi không xác định khi xử lý {srt_file}: {e}")
+#         print(f"[🔥] [ERROR] không xác định khi xử lý {srt_file}: {e}")
 
 # def main():
 #     srt_files = glob.glob("*.merge4.srt")
@@ -138,10 +138,10 @@ if __name__ == "__main__":
 #         )
 #         print(f"[✅] Đã tạo MP3: {mp3_file}")
 #     except subprocess.CalledProcessError as e:
-#         print(f"[❌] Lỗi khi tạo {mp3_file}")
+#         print(f"[❌] [ERROR] khi tạo {mp3_file}")
 #         print(f"     ↳ Trạng thái: {e.returncode}")
 #     except Exception as e:
-#         print(f"[🔥] Lỗi không xác định khi xử lý {srt_file}: {e}")
+#         print(f"[🔥] [ERROR] không xác định khi xử lý {srt_file}: {e}")
 
 # def main():
 #     # Xác định thư mục storage cùng cấp với thư mục cha của script

@@ -109,7 +109,7 @@ class YouTubeRSSReader:
                 feed = feedparser.parse(channel['rss_url'])
                 
                 if feed.bozo:
-                    print(f"⚠️ Lỗi khi đọc RSS feed cho {channel['name']}: {feed.bozo_exception}")
+                    print(f"⚠️ [ERROR] khi đọc RSS feed cho {channel['name']}: {feed.bozo_exception}")
                     continue
                 
                 channel_videos = 0
@@ -157,7 +157,7 @@ class YouTubeRSSReader:
                 print(f"   📊 Tìm thấy {channel_videos} video mới từ {channel['name']}")
                 
             except Exception as e:
-                print(f"❌ Lỗi khi xử lý kênh {channel['name']}: {str(e)}")
+                print(f"❌ [ERROR] khi xử lý kênh {channel['name']}: {str(e)}")
         
         # Sắp xếp video theo thời gian mới nhất
         self.new_videos.sort(key=lambda x: x['published_datetime'], reverse=True)
@@ -399,7 +399,7 @@ if __name__ == "__main__":
 #                 feed = feedparser.parse(channel['rss_url'])
                 
 #                 if feed.bozo:
-#                     print(f"⚠️ Lỗi khi đọc RSS feed cho {channel['name']}: {feed.bozo_exception}")
+#                     print(f"⚠️ [ERROR] khi đọc RSS feed cho {channel['name']}: {feed.bozo_exception}")
 #                     continue
                 
 #                 channel_videos = 0
@@ -442,7 +442,7 @@ if __name__ == "__main__":
 #                 print(f"   📊 Tìm thấy {channel_videos} video mới từ {channel['name']}")
                 
 #             except Exception as e:
-#                 print(f"❌ Lỗi khi xử lý kênh {channel['name']}: {str(e)}")
+#                 print(f"❌ [ERROR] khi xử lý kênh {channel['name']}: {str(e)}")
         
 #         # Sắp xếp video theo thời gian mới nhất
 #         self.new_videos.sort(key=lambda x: x['published_datetime'], reverse=True)
