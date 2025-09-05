@@ -2,7 +2,7 @@ name: Pipeline2 Scheduler
 
 on:
   schedule:
-    - cron: "0 20 */3 * *" # 3h sáng GMT+7 (20h UTC) mỗi 3 ngày
+    - cron: "0 20 */4 * *" # 3h sáng GMT+7 (20h UTC) mỗi 3 ngày
   workflow_dispatch: # Cho phép chạy thủ công
 
 jobs:
