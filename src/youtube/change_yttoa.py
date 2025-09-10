@@ -49,13 +49,13 @@ def main():
     """
     Main function to read file, convert links, and write results
     """
-    input_file = 'link_youtube_recent_2days.txt'
+    input_file = 'link_youtube_recent_4days.txt'
     output_file = 'archive_links.txt'
     
     # Check if input file exists
     if not os.path.exists(input_file):
         print(f"[ERROR] File '{input_file}' not found")
-        print("Please create 'link_youtube_recent_2days.txt' and add YouTube links into it.")
+        print("Please create 'link_youtube_recent_4days.txt' and add YouTube links into it.")
         return
     
     converted_links = []
