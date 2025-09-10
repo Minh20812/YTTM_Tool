@@ -19,7 +19,7 @@ def run_processing_pipeline():
 
     # Danh sách script cần chạy theo thứ tự (script, args)
     scripts = [
-        ("get_url_video_fromFirebase.py", ["--export-recent", "2"]),
+        ("get_url_video_fromFirebase.py", ["--export-recent", "4"]),
         ("change_yttoa.py", []),
         ("check_audio_active.py", []),
         ("change_atoyt.py", []),
