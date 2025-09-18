@@ -33,7 +33,7 @@ def convert_youtube_to_archive(youtube_url):
     if video_id.startswith('-'):
         # Example: -R0fPJQr0qo -> a__R0fPJQr0qo
         folder_name = 'a_' + video_id.replace('-', '_')
-        file_name = video_id.replace('-', '_') + '.ogg'
+        file_name = video_id.replace('-', '__') + '.ogg'
     elif video_id.startswith('_'):
         # Example: _wDIe0XEmwI -> a_wDIe0XEmwI
         folder_name = 'a' + video_id
