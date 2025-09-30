@@ -1,4 +1,4 @@
-name: Pipeline2 Scheduler
+name: Pipeline3 Scheduler
 
 on:
   schedule:
