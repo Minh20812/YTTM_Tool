@@ -8,3 +8,5 @@ python-dotenv
 feedparser
 requests
 youtube-transcript-api
+selenium
+webdriver-manager
